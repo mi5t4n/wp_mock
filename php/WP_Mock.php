@@ -86,12 +86,24 @@ class WP_Mock {
 	/**
 	 * Bootstrap WP_Mock
 	 */
-	public static function bootstrap() {
+	public static function bootstrap( $options = array() ) {
+		$options = array_merge( array(
+			'mock_constants' => true,
+			'mock_functions' => true,
+		), $options );
+
 		if ( ! self::$__bootstrapped ) {
 			self::$__bootstrapped        = true;
 			static::$deprecated_listener = new \WP_Mock\DeprecatedListener();
-			require_once __DIR__ . '/WP_Mock/API/function-mocks.php';
-			require_once __DIR__ . '/WP_Mock/API/constant-mocks.php';
+
+			if ( $options[ 'mock_functions'] ) {
+				require_once __DIR__ . '/WP_Mock/API/function-mocks.php';
+			}
+
+			if ( $options[ 'mock_constants'] ) {
+				require_once __DIR__ . '/WP_Mock/API/constant-mocks.php';
+			}
+
 			if ( self::usingPatchwork() ) {
 				$possible_locations = array(
 					'vendor',
