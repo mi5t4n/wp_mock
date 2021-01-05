@@ -14,10 +14,13 @@ class Functions {
 
 	private $patchwork_functions = array();
 
+	private $mock_hooks = true;
+
 	/**
 	 * Constructor for the Functions object
 	 */
-	public function __construct() {
+	public function __construct( $mock_hooks = true ) {
+		$this->mock_hooks = $mock_hooks;
 		Handler::cleanup();
 		$this->flush();
 	}
@@ -32,7 +35,7 @@ class Functions {
 		if ( function_exists( 'Patchwork\undoAll' ) ) {
 			\Patchwork\restoreAll();
 		}
-		if ( empty( self::$wp_mocked_functions ) ) {
+		if ( empty( self::$wp_mocked_functions ) && $this->mock_hooks ) {
 			self::$wp_mocked_functions = array(
 				'add_action',
 				'do_action',

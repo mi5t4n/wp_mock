@@ -52,6 +52,12 @@ class WP_Mock {
 
 	protected static $deprecated_listener;
 
+	protected static $options = array(
+		'mock_constants' => true,
+		'mock_functions' => true,
+		'mock_hooks'     => true
+	);
+
 	/**
 	 * @param boolean $use_patchwork
 	 */
@@ -87,20 +93,21 @@ class WP_Mock {
 	 * Bootstrap WP_Mock
 	 */
 	public static function bootstrap( $options = array() ) {
-		$options = array_merge( array(
+		self::$options = array_merge( array(
 			'mock_constants' => true,
 			'mock_functions' => true,
+			'mock_hooks'     => true
 		), $options );
 
 		if ( ! self::$__bootstrapped ) {
 			self::$__bootstrapped        = true;
 			static::$deprecated_listener = new \WP_Mock\DeprecatedListener();
 
-			if ( $options[ 'mock_functions'] ) {
+			if ( self::$options[ 'mock_functions'] ) {
 				require_once __DIR__ . '/WP_Mock/API/function-mocks.php';
 			}
 
-			if ( $options[ 'mock_constants'] ) {
+			if ( self::$options[ 'mock_constants'] ) {
 				require_once __DIR__ . '/WP_Mock/API/constant-mocks.php';
 			}
 
@@ -131,7 +138,7 @@ class WP_Mock {
 			\Mockery::close();
 
 			self::$event_manager    = new \WP_Mock\EventManager();
-			self::$function_manager = new \WP_Mock\Functions();
+			self::$function_manager = new \WP_Mock\Functions( self::$options ['mock_hooks']);
 		} else {
 			self::bootstrap();
 		}
